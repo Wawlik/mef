@@ -1,13 +1,16 @@
 <template>
 	<div class="inputGroup">
 		<input type="text" :id="'input-' + data.id"
-			v-bind:value="count"
+			v-model="count"
+			@click="$emit('focus-gained')"
+			@blur="$emit('focus-lost')"
 			style="width:50px;min-width:50px!important"
-			v-on:input="checkText($event.target.value)">
+			@input="checkText($event.target.value)">
 	</div>
 </template>
 
 <script>
+
 export default {
 	name: 'inputGroup',
 	props: {
@@ -29,19 +32,22 @@ export default {
 	},
 	methods: {
 		checkText(val = this.$props.data.count) {
+			// first enter
             if(typeof val !== 'number') {
+				// replace all spaces
                 val = val.replace(/\s/g, '');
 			}
+			console.log({val});
 			let v = null;
-			if(Number.isNaN(+v)) {
-				v = val.replace(/[^\d]/g,'');
+			if(Number.isNaN(+val)) {
+				// replace all letters
+				v = +val.replace(/[^\d]/g,'');
 			}
 			v = v || val;
-			if(!Number.isNaN(+v)) {
-                this.count = (+v).toLocaleString();
-                this.autoSizeInput(this.count);
-			}
-			return;
+			// if(!Number.isNaN(+v)) {
+			this.count = (+v).toLocaleString();
+			this.autoSizeInput(this.count);
+			// }
         },
         autoSizeInput(count) {
             const input = document.getElementById('input-'+this.$props.data.id);

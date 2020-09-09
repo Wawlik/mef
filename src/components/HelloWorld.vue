@@ -1,16 +1,22 @@
 <template>
 	<div class="hello">
-	<h1>{{ msg }}</h1>
-	<div v-for="one in persons" :key="'person-' + one.id" class="person">
-		<img src="@/assets/child.jpg" alt="" class="person-avatar">
-		<div class="person-info">
-			<span class="person-info-name">{{one.name.toUpperCase()}} IS</span>
-			<div class="person-info-input-group">
-				<input-group :data="one"></input-group>
-				<span class="person-info-input-prefix">{{one.prefix}}</span>
+		<h1>{{ msg }}</h1>
+		<div v-for="(one, ind) in persons" :key="'person-' + one.id" :class="'person ' + (colored === ind ? 'person--colored':'')">
+			<div class="person-avatar--wrapper">
+				<img src="@/assets/hugh.png" alt="" class="person-avatar">
+			</div>
+			<div class="person-info">
+				<span class="person-info-name">{{one.name.toUpperCase()}} IS</span>
+				<div class="person-info-input-group">
+					<input-group 
+						:data="one"
+						@focus-gained="colored = ind"
+						@focus-lost="colored = null"
+						></input-group>
+					<span class="person-info-input-prefix">{{one.prefix}}</span>
+				</div>
 			</div>
 		</div>
-	</div>
 	</div>
 </template>
 
@@ -28,9 +34,10 @@ export default {
 	},
 	data(){
 		return{
-			persons: []
+			persons: [],
+			colored: null
 		}
-	}, 
+	},
 	mounted(){
 		this.persons = data;
 	}
@@ -48,7 +55,7 @@ export default {
 	.hello{
 		margin: auto;
 	}
-	.person-avatar{
+	.person-avatar, .person-avatar--wrapper{
 		border-radius: 50%;
 		width: 100px;
 		height: 100px;
@@ -68,5 +75,16 @@ export default {
 	.person-info-name{
         font-size: 13px;
 		font-weight: bold;
+		transition: all 0.25s;
+	}
+	.person--colored > .person-info-name--colored{
+		color: #2540ff;
+	}
+	.person--colored > .person-avatar--wrapper{
+		border: 2px solid #2540ff;
+		margin: -2px;
+	}
+	.person--colored > .person-info > .person-info-name{
+		color: #2540ff;
 	}
 </style>
