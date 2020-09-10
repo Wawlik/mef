@@ -5,7 +5,7 @@
 			@click="$emit('focus-gained')"
 			@blur="$emit('focus-lost')"
 			style="width:50px;min-width:50px!important"
-			@input="checkText($event.target.value, $event.target, $event)">
+			@input="getFormattedText($event.target.value, $event.target, $event)">
 	</div>
 </template>
 
@@ -24,6 +24,84 @@ export default {
 		}
 	},
 	methods: {
+		getFormattedText(val = this.$props.data.count, target, evt) {
+			// console.log({evt})
+            // if(typeof val !== 'number') {
+			// 	// replace all spaces
+			// 	val = this.replaceSpaces(val);
+			// }
+
+			let v = null;
+
+			if(Number.isNaN(+val)) {
+				// replace all letters
+				v = +val.replace(/[\D]/g,'');
+			}
+			v = v || val;
+
+			// case deleting ' '
+			let vtls = (+v).toLocaleString();
+			const tss = target?.selectionStart;
+			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
+				// backspace btn
+				vtls = this.deleteContentBackward(vtls, target, tss);
+				this.setCaretPos(target, tss-1);
+			} else if (evt?.inputType === 'deleteContentForward' && (vtls === this.vl)){
+				// delete btn 
+				vtls = this.deleteContentForward(vtls, target, tss);
+				this.setCaretPos(target, tss+1);
+			}  else if (evt?.inputType === 'deleteContentBackward' || evt?.inputType === 'deleteContentForward'){
+				this.setCaretPos(target, tss);
+			} else if(evt?.inputType === 'insertText'){
+				// insert text save caret pos
+				if(tss !== vtls.length){
+					//get without spaces length
+					const lvs = this.replaceSpaces(vtls);
+					//if next num adding new space
+					if(lvs.length % 3 == 1){
+						this.setCaretPos(target, tss+1);
+					} else {
+						this.setCaretPos(target, tss);
+					}
+				}
+			}
+
+			// if(!Number.isNaN(+v)) {
+			this.count = vtls;
+			this.autoSizeInput(this.count);
+			// }
+			//save last state to get caret pos if needed
+			this.vl = this.count;
+		},
+		replaceSpaces(v){
+			// '\D' === not digit
+			return v.replace(/\D/g, '');
+		},
+		deleteContentBackward(v, target, tss){
+			v = v.slice(0, tss-1) + v.slice(tss, v.length);
+			return this.getFormatedInputString(v);
+		},
+		deleteContentForward(v, target, tss){
+			v = v.slice(0, tss+1) + v.slice(tss+2, v.length);
+			return this.getFormatedInputString(v);
+		},
+		getFormatedInputString(v){
+			v = this.replaceSpaces(v);
+			return (+v).toLocaleString();
+		},
+		setCaretPos(target, t){
+			setTimeout(() => {
+				target.selectionStart = target.selectionEnd = t;
+			}, 1);
+		},
+        autoSizeInput(count) {
+			const input = document.getElementById('input-'+this.$props.data.id);
+            if(input) {
+				// const userAgent = navigator.userAgent.toLowerCase();
+				// const Mozila = /firefox/.test(userAgent);
+				input.style.width = ((count.length + 1) * 6.7) + 'px';
+            }
+        },
 		//decorator case
 		// input_inputHandler(target){
 		// 	// count is last value
@@ -45,83 +123,16 @@ export default {
 		// 		setTimeout(() => {
 		// 			target.selectionStart = target.selectionEnd = this.carPos;
 		// 		}, 1);
-		// 		//remember last value to compare whenever its deleting or not
 		// 	this.autoSizeInput(this.count);
 		// },
-		replaceSpaces(v){
-			// '\D' === not digit
-			return v.replace(/\D/g, '');
-		},
-		checkText(val = this.$props.data.count, target, evt) {
-			console.log({evt})
-			console.log({target})
-            if(typeof val !== 'number') {
-				// replace all spaces
-				val = this.replaceSpaces(val);
-			}
-
-			let v = null;
-
-			if(Number.isNaN(+val)) {
-				// replace all letters
-				v = +val.replace(/[^\d]/g,'');
-			}
-			v = v || val;
-
-			// case deleting ' '
-			let vtls = (+v).toLocaleString();
-			const tss = target?.selectionStart;
-			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
-				// backspace btn
-				vtls = vtls.slice(0, tss-1) + vtls.slice(tss, vtls.length);
-				setTimeout(() => {
-					target.selectionStart = target.selectionEnd = tss - 1;
-				}, 1);
-				vtls = this.replaceSpaces(vtls);
-				vtls = (+vtls).toLocaleString();
-			} else if (evt?.inputType === 'deleteContentForward' && (vtls === this.vl)){
-				// delete btn 
-				vtls = vtls.slice(0, tss+1) + vtls.slice(tss+2, vtls.length);
-				setTimeout(() => {
-					target.selectionStart = target.selectionEnd = tss+1;
-				}, 1);
-				vtls = this.replaceSpaces(vtls);
-				vtls = (+vtls).toLocaleString();
-			} else if (evt?.inputType === 'deleteContentForward'){
-				setTimeout(() => {
-					target.selectionStart = target.selectionEnd = tss;
-				}, 1);
-			} else if (evt?.inputType === 'deleteContentBackward'){
-				setTimeout(() => {
-					target.selectionStart = target.selectionEnd = tss;
-				}, 1);
-			} else if(evt?.data?.length){
-				target.selectionStart = target.selectionEnd = tss;
-			}
-
-			// if(!Number.isNaN(+v)) {
-			this.count = vtls;
-			this.autoSizeInput(this.count);
-			// }
-			//save last state to get caret pos if needed
-			this.vl = this.count;
-		},
-        autoSizeInput(count) {
-			const input = document.getElementById('input-'+this.$props.data.id);
-            if(input) {
-				// const userAgent = navigator.userAgent.toLowerCase();
-				// const Mozila = /firefox/.test(userAgent);
-				input.style.width = ((count.length + 1) * 6.7) + 'px';
-            }
-        }
 	},
 	computed:{
-		numData(){
+		inputData(){
 			return +this.replaceSpaces(this.count);
 		}
 	},
     mounted(){
-        this.checkText();
+        this.getFormattedText();
     }
 }
 </script>
