@@ -5,7 +5,7 @@
 			@click="$emit('focus-gained')"
 			@blur="$emit('focus-lost')"
 			style="width:50px;min-width:50px!important"
-			@input="checkText($event.target.value)">
+			@input="checkText($event.target.value, $event.target, $event)">
 	</div>
 </template>
 
@@ -18,44 +18,108 @@ export default {
 	},
 	data(){
 		return{
-			count: this.$props.data.count || 0
+			count: this.$props.data.count || 0,
+			//last value
+			vl: null
 		}
 	},
-	computed:{
-		isFocus(){
-			const a = document.getElementById(this.$props.data.count);
-			if(a){
-				return 1;
-			}
-			return 2;
-		},
-	},
 	methods: {
-		checkText(val = this.$props.data.count) {
-			// first enter
+		//decorator case
+		// input_inputHandler(target){
+		// 	// count is last value
+		// 	const isEqual = target.value === this.count;
+		// 	const InputFormatType = {
+		// 		THOUSAND: 3
+		// 	};
+		// 	const decorator = ( value, format = InputFormatType.THOUSAND ) => value
+		// 		.replace(/[^\d]/g,'')
+		// 		.split( '' )
+		// 		.filter( char => char !== " " )
+		// 		.reverse()
+		// 		.reduce( ( result, char, index ) => result += (( index >= format && index % format === 0 ? " " : "" ) + +char), "" )
+		// 		.split( '' )
+		// 		.reverse()
+		// 		.join( '' );
+		// 		this.count = decorator( target.value );
+		// 		// to save caret position
+		// 		setTimeout(() => {
+		// 			target.selectionStart = target.selectionEnd = this.carPos;
+		// 		}, 1);
+		// 		//remember last value to compare whenever its deleting or not
+		// 	this.autoSizeInput(this.count);
+		// },
+		replaceSpaces(v){
+			// '\D' === not digit
+			return v.replace(/\D/g, '');
+		},
+		checkText(val = this.$props.data.count, target, evt) {
+			console.log({evt})
+			console.log({target})
             if(typeof val !== 'number') {
 				// replace all spaces
-                val = val.replace(/\s/g, '');
+				val = this.replaceSpaces(val);
 			}
-			console.log({val});
+
 			let v = null;
+
 			if(Number.isNaN(+val)) {
 				// replace all letters
 				v = +val.replace(/[^\d]/g,'');
 			}
 			v = v || val;
+
+			// case deleting ' '
+			let vtls = (+v).toLocaleString();
+			const tss = target?.selectionStart;
+			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
+				// backspace btn
+				vtls = vtls.slice(0, tss-1) + vtls.slice(tss, vtls.length);
+				setTimeout(() => {
+					target.selectionStart = target.selectionEnd = tss - 1;
+				}, 1);
+				vtls = this.replaceSpaces(vtls);
+				vtls = (+vtls).toLocaleString();
+			} else if (evt?.inputType === 'deleteContentForward' && (vtls === this.vl)){
+				// delete btn 
+				vtls = vtls.slice(0, tss+1) + vtls.slice(tss+2, vtls.length);
+				setTimeout(() => {
+					target.selectionStart = target.selectionEnd = tss+1;
+				}, 1);
+				vtls = this.replaceSpaces(vtls);
+				vtls = (+vtls).toLocaleString();
+			} else if (evt?.inputType === 'deleteContentForward'){
+				setTimeout(() => {
+					target.selectionStart = target.selectionEnd = tss;
+				}, 1);
+			} else if (evt?.inputType === 'deleteContentBackward'){
+				setTimeout(() => {
+					target.selectionStart = target.selectionEnd = tss;
+				}, 1);
+			} else if(evt?.data?.length){
+				target.selectionStart = target.selectionEnd = tss;
+			}
+
 			// if(!Number.isNaN(+v)) {
-			this.count = (+v).toLocaleString();
+			this.count = vtls;
 			this.autoSizeInput(this.count);
 			// }
-        },
+			//save last state to get caret pos if needed
+			this.vl = this.count;
+		},
         autoSizeInput(count) {
-            const input = document.getElementById('input-'+this.$props.data.id);
+			const input = document.getElementById('input-'+this.$props.data.id);
             if(input) {
-                input.style.width = ((count.length + 1) * 6.7) + 'px';
+				// const userAgent = navigator.userAgent.toLowerCase();
+				// const Mozila = /firefox/.test(userAgent);
+				input.style.width = ((count.length + 1) * 6.7) + 'px';
             }
         }
-    },
+	},
+	computed:{
+		numData(){
+			return +this.replaceSpaces(this.count);
+		}
+	},
     mounted(){
         this.checkText();
     }
@@ -63,7 +127,7 @@ export default {
 </script>
 
 <style scoped>
-/* scoped to disable outer interactions */
+/* scoped to disable outer interactions of styles */
 	.inputGroup > input{
 		border: none;
 		border-bottom: 1px solid #c9c9cf;
@@ -74,6 +138,7 @@ export default {
         font-weight: bold;
         line-height: 1.21;
         color: #2c2c30;
+		font-family: 'Roboto', sans-serif;
 	}
 	.inputGroup > input:focus{
 		border: none;

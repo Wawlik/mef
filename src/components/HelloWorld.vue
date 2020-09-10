@@ -51,6 +51,7 @@ export default {
 		justify-content: flex-start;
 		align-items: center;
 		color: #2c2c30;
+		font-family: 'Roboto', sans-serif;
 	}
 	.hello{
 		margin: auto;
