@@ -19,7 +19,7 @@ export default {
 	data(){
 		return{
 			count: this.$props.data.count || '',
-			//last value
+			// last value
 			vl: null
 		}
 	},
@@ -41,7 +41,7 @@ export default {
 
 			// case deleting ' '
 			let vtls = (+v).toLocaleString();
-			vtls = vtls.replace(/[,]/g,' ');
+			vtls = vtls.replace(/[,]/g, ' ');
 			const tss = target?.selectionStart;
 			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
 				// backspace btn
@@ -66,12 +66,11 @@ export default {
 					}
 				}
 			}
-
 			// if(!Number.isNaN(+v)) {
 			this.count = vtls || '';
 			this.autoSizeInput(this.count);
 			// }
-			//save last state to get caret pos if needed
+			// save last state to get caret pos if needed
 			this.vl = this.count;
 		},
 		replaceSpaces(v){
@@ -88,7 +87,7 @@ export default {
 		},
 		getFormatedInputString(v){
 			v = this.replaceSpaces(v);
-			//replace commas
+			// replace commas
 			return ((+v).toLocaleString()).replace(/[,]/g,' ');
 		},
 		setCaretPos(target, t){

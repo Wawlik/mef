@@ -1,7 +1,7 @@
 <template>
 	<div class="hello">
 		<h1>{{ msg }}</h1>
-		<div v-for="(one, ind) in persons" :key="'person-' + one.id" :class="'person ' + (colored === ind ? 'person--colored':'')">
+		<div v-for="(one, ind) in persons" :key="'person-' + one.id" :class="'person person--colored' + (colored === ind ? 'person--colored':'')">
 			<div class="person-avatar--wrapper">
 				<img src="@/assets/hugh.png" alt="" class="person-avatar">
 			</div>
@@ -56,10 +56,17 @@ export default {
 	.hello{
 		margin: auto;
 	}
-	.person-avatar, .person-avatar--wrapper{
+	.person-avatar--wrapper{
+		display: inline-block;
+		border-radius: 50%;
+		width: 104px;
+		height: 104px;
+	}
+	.person-avatar{
 		border-radius: 50%;
 		width: 100px;
 		height: 100px;
+		padding-left: 4px;
 	}
 	.person-info{
 		margin-left: 20px;
