@@ -1,7 +1,8 @@
 <template>
 	<div class="hello">
 		<h1>{{ msg }}</h1>
-		<div v-for="(one, ind) in persons" :key="'person-' + one.id" :class="'person person--colored' + (colored === ind ? 'person--colored':'')">
+		<div v-for="(one, ind) in persons" :key="'person-' + one.id"
+			:class="'person ' + (colored === ind ? 'person--colored' :'')">
 			<div class="person-avatar--wrapper">
 				<img src="@/assets/hugh.png" alt="" class="person-avatar">
 			</div>
@@ -75,7 +76,7 @@ export default {
 	}
 	.person-info-input-group{
 		display: flex;
-		margin-top:20px;
+		margin-top: 20px;
 	}
 	.person-info-input-prefix{
 		margin-left: 10px;

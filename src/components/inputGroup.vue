@@ -5,6 +5,7 @@
 			@click="$emit('focus-gained')"
 			@blur="$emit('focus-lost')"
 			style="width:50px;min-width:50px!important"
+			placeholder="7"
 			@input="getFormattedText($event.target.value, $event.target, $event)">
 	</div>
 </template>
@@ -26,10 +27,10 @@ export default {
 	methods: {
 		getFormattedText(val = this.$props.data.count, target, evt) {
 			// console.log({evt})
-            // if(typeof val !== 'number') {
-			// 	// replace all spaces
-			// 	val = this.replaceSpaces(val);
-			// }
+            if(typeof val !== 'number') {
+				// replace all spaces
+				val = this.replaceSpaces(val);
+			}
 
 			let v = null;
 
@@ -40,7 +41,7 @@ export default {
 			v = v || val;
 
 			// case deleting ' '
-			let vtls = (+v).toLocaleString();
+			let vtls = (v? +v : '').toLocaleString();
 			vtls = vtls.replace(/[,]/g, ' ');
 			const tss = target?.selectionStart;
 			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
@@ -88,7 +89,7 @@ export default {
 		getFormatedInputString(v){
 			v = this.replaceSpaces(v);
 			// replace commas
-			return ((+v).toLocaleString()).replace(/[,]/g,' ');
+			return ((v? +v : '').toLocaleString()).replace(/[,]/g,' ');
 		},
 		setCaretPos(target, t){
 			setTimeout(() => {
