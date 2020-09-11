@@ -41,6 +41,7 @@ export default {
 
 			// case deleting ' '
 			let vtls = (+v).toLocaleString();
+			vtls = vtls.replace(/[,]/g,' ');
 			const tss = target?.selectionStart;
 			if(evt?.inputType === 'deleteContentBackward' && (vtls === this.vl)){
 				// backspace btn
@@ -87,7 +88,8 @@ export default {
 		},
 		getFormatedInputString(v){
 			v = this.replaceSpaces(v);
-			return (+v).toLocaleString();
+			//replace commas
+			return ((+v).toLocaleString()).replace(/[,]/g,' ');
 		},
 		setCaretPos(target, t){
 			setTimeout(() => {
