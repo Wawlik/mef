@@ -18,7 +18,7 @@ export default {
 	},
 	data(){
 		return{
-			count: this.$props.data.count || 0,
+			count: this.$props.data.count || '',
 			//last value
 			vl: null
 		}
@@ -67,7 +67,7 @@ export default {
 			}
 
 			// if(!Number.isNaN(+v)) {
-			this.count = vtls;
+			this.count = vtls || '';
 			this.autoSizeInput(this.count);
 			// }
 			//save last state to get caret pos if needed
