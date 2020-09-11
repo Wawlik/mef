@@ -4,9 +4,7 @@
 			<input-group 
 				v-if="inputData"
 				:data="inputData"
-				@focus-gained="colored = ind"
-				@focus-lost="colored = null"
-				></input-group>
+			></input-group>
 	</div>
 </template>
 
