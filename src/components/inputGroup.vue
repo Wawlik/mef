@@ -11,7 +11,6 @@
 						v-model="count"
 						@click="focused = true"
 						@blur="focused = false"
-						style="width:50px;min-width:50px!important"
 						placeholder="7"
 						@input="getFormattedText($event.target.value, $event.target, $event)">
 					<span class="person-info-input-prefix">{{data.prefix}}</span>
@@ -155,8 +154,7 @@ export default {
 }
 </script>
 
-<style >
-/* scoped to disable outer interactions of styles */
+<style>
 	.person{
 		display: flex;
 		margin-bottom: 20px;
@@ -207,14 +205,14 @@ export default {
 	.person-count--input{
 		border: none;
 		border-bottom: 1px solid #c9c9cf;
-		width: auto;
-        resize: both;
         transition: all 0.25s;
         font-size: 14px;
         font-weight: bold;
         line-height: 1.21;
         color: #2c2c30;
 		font-family: 'Roboto', sans-serif;
+		width: 50px;
+		min-width: 50px !important;
 	}
 	.person-count--input:focus{
 		border: none;
